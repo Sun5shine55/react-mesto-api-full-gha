@@ -1,0 +1,8 @@
+.popup__item-error_type_show {
+    border: 0;
+    border-bottom: 1px solid #FF0000;
+    }
+    
+    .popup__item-error_type_show:focus {
+        border: 1px solid #FF0000;
+        }

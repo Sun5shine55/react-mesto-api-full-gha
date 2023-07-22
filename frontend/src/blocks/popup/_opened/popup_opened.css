@@ -1,0 +1,6 @@
+.popup_opened {
+    display: flex;
+    cursor: pointer;
+    opacity: 1;
+    visibility: visible;
+}

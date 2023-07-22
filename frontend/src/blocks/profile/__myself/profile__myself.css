@@ -1,0 +1,32 @@
+.profile__myself {
+    max-width: 500px;
+    margin: 0;
+    color: #ffffff;
+    font-family: 'Inter', Arial, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+@media screen and (max-width: 1023px) {
+    .profile__myself {
+        max-width: 400px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .profile__myself {
+        max-width: 320px;
+        font-size: 14px;
+        line-height: 17px;
+        text-align: center;
+        grid-column-start: 2;
+        grid-column-end: 3;
+        grid-row-start: 2;
+        grid-row-end: 3;
+    }
+}

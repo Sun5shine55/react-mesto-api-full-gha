@@ -1,0 +1,15 @@
+.popup__container-image {
+    width: 816px;
+    height: 540px;
+    margin: auto;
+    position: relative;
+    background-color: #000000;
+    
+}
+
+@media screen and (max-width: 767px) {
+    .popup__container-image {
+        width: 240px;
+        height: 299px;
+    }
+}

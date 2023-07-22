@@ -1,0 +1,29 @@
+.card {
+    display: grid;
+    grid-template-rows: minmax(282px, max-content) minmax(79px, max-content);
+    grid-auto-flow: column;
+    border-radius: 10px;
+    position: relative;
+}
+
+@media screen and (max-width:1279px) {
+    .card {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 928px;
+    }
+}
+
+@media screen and (max-width:1023px) {
+    .card {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 720px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .card {
+        grid-template-columns: repeat(1, 1fr);
+        max-width: 288px;
+        margin: 0 auto 0 auto;
+    }
+}

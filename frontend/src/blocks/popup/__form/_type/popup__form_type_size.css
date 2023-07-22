@@ -1,0 +1,3 @@
+.popup__form_type_size {
+    grid-template-rows: minmax(29px, max-content) minmax(24px, max-content) minmax(50px, max-content);
+}

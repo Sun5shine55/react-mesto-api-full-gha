@@ -1,0 +1,10 @@
+.card__label {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    max-width: 246px;
+    max-height: 79px;
+    background-color: #ffffff;
+    padding: 0 18px 0 18px;
+    border-radius: 0 0 10px 10px;
+}
