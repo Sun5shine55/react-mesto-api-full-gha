@@ -51,7 +51,7 @@ class MestoAuth {
 }
 
 const auth = new MestoAuth({
-  baseUrl: "http://mesto.nutus.nomoredomains.xyz",
+  baseUrl: "http://api.mesto.nutus.nomoredomains.xyz",
   headers: {
     "Content-Type": "application/json",
   },
