@@ -6,6 +6,8 @@ const ValidationError = require('../errors/ValidationError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const ConflictError = require('../errors/ConflictError');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -85,16 +87,28 @@ const updateUserAvatar = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email })
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) { throw new UnauthorizedError('Пользователь с таким email не зарегистрирован'); }
-      return User.findUserByCredentials(email, password)
-        .then((inputUser) => {
-          res.status(200).send({ token: jwt.sign({ _id: inputUser._id }, 'here-there-is-my-key', { expiresIn: '7d' }) });
-        })
-        .catch(() => { throw new UnauthorizedError('Ошибка авторизации'); });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'here-there-is-my-key', { expiresIn: '7d' });
+      res.cookie('jwt', token, {
+        maxAge: 64000000,
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+      });
+      return res.status(200).send({ email });
     })
-    .catch(next);
+    .catch(() => {
+      next(UnauthorizedError('Ошибка авторизации'));
+    });
+};
+
+const logout = (req, res) => {
+  res.clearCookie('jwt', {
+    sameSite: 'none',
+    secure: true,
+  }).send({ message: 'Вы вышли из системы' });
 };
 
 module.exports = {
@@ -105,4 +119,5 @@ module.exports = {
   updateUserAvatar,
   login,
   getMyData,
+  logout,
 };

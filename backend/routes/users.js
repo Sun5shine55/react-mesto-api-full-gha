@@ -7,6 +7,7 @@ const {
   getMyData,
   updateUserData,
   updateUserAvatar,
+  logout,
 } = require('../controllers/users');
 
 router.get('/users/me', getMyData);
@@ -31,5 +32,7 @@ router.patch('/users/me/avatar', celebrate({
     avatar: Joi.string().required().pattern(/^(https?:\/\/)(www\.)?[a-z0-9-._~:/?#[\]@!$&()*+,;=]{1,256}\.[a-z]{2,6}\b([a-z0-9-._~:/?#[\]@!$&()*+,;=]*)/i),
   }).unknown(true),
 }), updateUserAvatar);
+
+router.get('/signout', logout);
 
 module.exports = router;
