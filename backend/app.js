@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const { celebrate, errors, Joi } = require('celebrate');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
@@ -18,6 +19,12 @@ app.use(bodyParser.json());
 const { PORT = 3000 } = process.env;
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb').then(() => {
 });
+
+app.use(cors({
+  origin: 'https://domain.kordik.nomoreparties.sbs',
+  credentials: true,
+}));
+
 app.use(requestLogger); // подключаем логгер запросов
 
 app.post(
