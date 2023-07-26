@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { celebrate, errors, Joi } = require('celebrate');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
@@ -13,6 +14,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 app.disable('x-powered-by');
+app.use(cookieParser());
 app.use(helmet());
 app.use(bodyParser.json());
 
