@@ -26,9 +26,7 @@ app.use(cors({
   origin: 'https://mesto.nutus.nomoredomains.xyz',
   credentials: true,
 }));
-
 app.use(requestLogger); // подключаем логгер запросов
-
 app.post(
   '/signin',
   celebrate({
