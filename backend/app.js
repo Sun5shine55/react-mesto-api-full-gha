@@ -57,10 +57,9 @@ app.use('/', auth, cardRoutes);
 app.all('*', (req, res) => {
   res.status(404).send({ message: 'Указан неправильный путь' });
 });
-
+app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 app.use(errorHandler);
-app.use(errorLogger); // подключаем логгер ошибок
 
 app.listen(PORT, () => {
 });
