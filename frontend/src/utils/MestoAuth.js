@@ -1,46 +1,40 @@
 class MestoAuth {
-  constructor(params) {
-    this._url = params.baseUrl;
-    this._headers = params.headers;
+  constructor(options) {
+    this.baseUrl = options.baseUrl;
   }
 
-  register(email, password) {
-    return fetch(`${this._url}/signup`, {
+  register = ({ email, password }) => {
+    return fetch(`${this.baseUrl}/signup`, {
       method: "POST",
-      headers: this._headers,
-      credentials: 'include',
-      body: JSON.stringify({
-        password: password,
-        email: email,
-      }),
-    }).then((res) => {
-      return this._checkResult(res);
-    });
-  }
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    }).then(this._checkResult);
+  };
 
-  authorize(email, password) {
-    return fetch(`${this._url}/signin`, {
+  authorize = ({ email, password }) => {
+    return fetch(`${this.baseUrl}/signin`, {
       method: "POST",
-      headers: this._headers,
-      credentials: 'include',
-      body: JSON.stringify({
-        password: password,
-        email: email,
-      }),
-    }).then((res) => {
-      return this._checkResult(res);
-    });
-  }
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    }).then(this._checkResult);
+  };
 
-  checkToken(token) {
-    return fetch(`${this._url}/users/me`, {
+  checkToken = (token) => {
+    return fetch(`${this.baseUrl}/users/me`, {
       method: "GET",
-      headers: this._headers,
-      credentials: 'include',
-    }).then((res) => {
-      return this._checkResult(res);
-    });
-  }
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+    }).then(this._checkResult);
+  };
 
   _checkResult(res) {
     if (res.ok) {
@@ -52,7 +46,10 @@ class MestoAuth {
   logout () {
     return fetch(`${this._url}/signout`, {
       method: 'GET',
-      headers: this._headers,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       credentials: 'include',
     })
     .then(res => {

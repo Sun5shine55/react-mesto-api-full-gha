@@ -1,93 +1,110 @@
 class Api {
-  constructor({ url, headers }) {
-    this.url = url;
-    this.headers = headers;
-  }
-
-  _request(url, { options }) {
-    return fetch(this.url, { options }).then(this._checkResult);
-  }
-
-  getCards() {
-    return this._request(`${this.url}/cards`, {
-      headers: this.headers,
-      credentials: 'include',
-    });
+  constructor(options) {
+    this.baseUrl = options.baseUrl;
+    this.apiToken = options.headers.authorization;
+    this.contentType = options.headers.contentType;
+    this._headers = options.headers;
   }
 
   _checkResult(res) {
     if (res.ok) {
       return res.json();
     }
-    return Promise.reject(`Ошибка ${res.status}`);
-  }
-
-  addCard({ placename, link }) {
-    return this._request(`${this.url}/cards`, {
-      method: "POST",
-      headers: this.headers,
-      body: JSON.stringify({ name: placename, link: link }),
-      credentials: 'include',
-    });
+    return Promise.reject(`Ошибка: ${res.status} ${res.message}` );
   }
 
   getUserData() {
-    return this._request(`${this.url}/users/me`, {
+    return fetch(`${this.baseUrl}/users/me`, {
       method: "GET",
-      headers: this.headers,
-      credentials: 'include',
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+    }).then((res) => {
+      return this._getResponseData(res);
+    });
+  }
+
+  getCards() {
+    return fetch(`${this.baseUrl}/cards`, {
+      method: "GET",
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+    }).then((res) => {
+      return this._getResponseData(res);
     });
   }
 
   editUserData({ name, about }) {
-    return this._request(`${this.url}/users/me`, {
+    return fetch(`${this.baseUrl}/users/me`, {
       method: "PATCH",
-      headers: this.headers,
-      body: JSON.stringify({ name: name, about: about }),
-      credentials: 'include',
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        name: name,
+        about: about,
+      }),
+    }).then((res) => {
+      return this._getResponseData(res);
     });
   }
 
-  editAvatar({ avatar }) {
-    return this._request(`${this.url}/users/me/avatar`, {
+  addCard({ name, link }) {
+    return fetch(`${this.baseUrl}/cards`, {
+      method: "POST",
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        name: name,
+        link: link,
+      }),
+    }).then((res) => {
+      return this._getResponseData(res);
+    });
+  }
+
+  deleteCard(cardId) {
+    return fetch(`${this.baseUrl}/cards/${cardId}`, {
+      method: "DELETE",
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+    }).then((res) => {
+      return this._getResponseData(res);
+    });
+  }
+
+  editAvatar(avatar) {
+    return fetch(`${this.baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      headers: this.headers,
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
       body: JSON.stringify({
         avatar: avatar,
       }),
-      credentials: 'include',
+    }).then((res) => {
+      return this._getResponseData(res);
     });
   }
 
-  putLike(id) {
-    return this._request(`${this.url}/cards/${id}/likes`, {
-      method: "PUT",
-      headers: this.headers,
-      credentials: 'include',
-    });
-  }
-
-  removeLike(id) {
-    return this._request(`${this.url}/cards/${id}/likes`, {
-      method: "DELETE",
-      headers: this.headers,
-      credentials: 'include',
-    });
-  }
-
-  changeLikeCardStatus(id, isLiked) {
-    if (isLiked) {
-      return this.removeLike(id);
-    } else {
-      return this.putLike(id);
-    }
-  }
-
-  deleteCard(id) {
-    return this._request(`${this.url}/cards/${id}`, {
-      method: "DELETE",
-      headers: this.headers,
-      credentials: 'include',
+  changeLikeCardStatus(cardId, likeStatus) {
+    return fetch(`${this.baseUrl}/cards/${cardId}/likes`, {
+      method: `${likeStatus ? "DELETE" : "PUT"}`,
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+    }).then((res) => {
+      return this._getResponseData(res);
     });
   }
 }
