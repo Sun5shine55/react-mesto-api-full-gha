@@ -2,11 +2,10 @@ class Api {
   constructor({ url, headers }) {
     this.url = url;
     this.headers = headers;
-    this._token = headers["authorization"];
   }
 
-  _request(url, options) {
-    return fetch(url, options).then(this._checkResult);
+  _request() {
+    return fetch(this.url).then(this._checkResult);
   }
 
   getCards() {
