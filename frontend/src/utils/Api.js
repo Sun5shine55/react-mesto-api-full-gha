@@ -4,8 +4,8 @@ class Api {
     this.headers = headers;
   }
 
-  _request() {
-    return fetch(this.url).then(this._checkResult);
+  _request(url, { options }) {
+    return fetch(this.url, { options }).then(this._checkResult);
   }
 
   getCards() {
