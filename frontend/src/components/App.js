@@ -178,23 +178,24 @@ function App() {
     setPopupWithConfirmOpen(true);
   }
 
-  function handleLogin(email, password) {
+  function handleLogin({ email, password }) {
     auth
-      .authorize(email, password)
-      .then((data) => {
-        localStorage.setItem("jwt", data.token);
-        setUserData(email);
-        setLoggedIn(true);
-        navigate("/");
+      .authorize({ email: email, password: password })
+      .then((res) => {
+        if (res.token) {
+          localStorage.setItem("token", res.token);
+          setLoggedIn(true);
+          navigate("/");
+        }
       })
       .catch((err) => {
         console.log(err.message);
       });
   }
 
-  function handleRegister(email, password) {
+  function handleRegister({ email, password }) {
     auth
-      .register(email, password)
+      .register({ email: email, password: password })
       .then((data) => {
         setIsSuccessfullSign(true);
         navigate("/sign-in");
@@ -208,12 +209,12 @@ function App() {
   }
 
   function verifyToken() {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
     auth
       .checkToken(token)
-      .then((data) => {
-        if (data) {
-          setUserData(data.data.email);
+      .then((res) => {
+        if (res) {
+          setUserData(res.email);
           setLoggedIn(true);
           navigate("/");
         } else {
@@ -232,7 +233,7 @@ function App() {
 
   function handleSignOut() {
     setLoggedIn(false);
-    localStorage.removeItem("jwt");
+    localStorage.removeItem("token");
     navigate("/sign-in");
   }
 
