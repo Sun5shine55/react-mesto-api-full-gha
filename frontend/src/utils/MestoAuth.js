@@ -1,40 +1,46 @@
 class MestoAuth {
-  constructor(options) {
-    this.baseUrl = options.baseUrl;
+  constructor(params) {
+    this._url = params.baseUrl;
+    this._headers = params.headers;
   }
 
-  register = ({ email, password }) => {
-    return fetch(`${this.baseUrl}/signup`, {
+  register(email, password) {
+    return fetch(`${this._url}/signup`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    }).then(this._checkResult);
-  };
+      headers: this._headers,
+      credentials: 'include',
+      body: JSON.stringify({
+        password: password,
+        email: email,
+      }),
+    }).then((res) => {
+      return this._checkResult(res);
+    });
+  }
 
-  authorize = ({ email, password }) => {
-    return fetch(`${this.baseUrl}/signin`, {
+  authorize(email, password) {
+    return fetch(`${this._url}/signin`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    }).then(this._checkResult);
-  };
+      headers: this._headers,
+      credentials: 'include',
+      body: JSON.stringify({
+        password: password,
+        email: email,
+      }),
+    }).then((res) => {
+      return this._checkResult(res);
+    });
+  }
 
-  checkToken = (token) => {
-    return fetch(`${this.baseUrl}/users/me`, {
+  checkToken(token) {
+    return fetch(`${this._url}/users/me`, {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token}`,
-      },
-    }).then(this._checkResult);
-  };
+      headers: this._headers,
+      credentials: 'include',
+    }).then((res) => {
+      return this._checkResult(res);
+    });
+  }
 
   _checkResult(res) {
     if (res.ok) {
@@ -46,10 +52,7 @@ class MestoAuth {
   logout () {
     return fetch(`${this._url}/signout`, {
       method: 'GET',
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       credentials: 'include',
     })
     .then(res => {
@@ -59,7 +62,10 @@ class MestoAuth {
 }
 
 const auth = new MestoAuth({
-  baseUrl: "https://api.mesto.nutus.nomoredomains.xyz"
+  baseUrl: "https://api.mesto.nutus.nomoredomains.xyz",
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 export default auth;

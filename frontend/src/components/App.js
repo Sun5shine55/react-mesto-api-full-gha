@@ -178,25 +178,23 @@ function App() {
     setPopupWithConfirmOpen(true);
   }
 
-  function handleLogin({ email, password }) {
+  function handleLogin(email, password) {
     auth
-      .authorize({ email: email, password: password })
-      .then((res) => {
-        if (res.token) {
-          localStorage.setItem("token", res.token);
+      .authorize(email, password)
+      .then(() => {
           setLoggedIn(true);
+          setUserData(email)
           navigate("/");
-        }
       })
       .catch((err) => {
         console.log(err.message);
       });
   }
 
-  function handleRegister({ email, password }) {
+  function handleRegister(email, password) {
     auth
-      .register({ email: email, password: password })
-      .then((data) => {
+      .register(email, password)
+      .then((user) => {
         setIsSuccessfullSign(true);
         navigate("/sign-in");
         handleInfoTooltipOpen();
@@ -209,12 +207,11 @@ function App() {
   }
 
   function verifyToken() {
-    const token = localStorage.getItem("token");
     auth
-      .checkToken(token)
-      .then((res) => {
-        if (res) {
-          setUserData(res.email);
+      .checkToken()
+      .then((data) => {
+        if (data) {
+          setUserData(data.email);
           setLoggedIn(true);
           navigate("/");
         } else {
@@ -222,6 +219,7 @@ function App() {
         }
       })
       .catch((err) => {
+        setLoggedIn(false);
         console.log(err.message);
       });
   }
@@ -232,9 +230,14 @@ function App() {
   }, []);
 
   function handleSignOut() {
-    setLoggedIn(false);
-    localStorage.removeItem("token");
-    navigate("/sign-in");
+    auth.logout()
+      .then(() => {
+        setLoggedIn(false);
+        navigate('/sign-in');
+      })
+      .catch((err) => {
+        console.log(err.message)
+      })
   }
 
   return (
