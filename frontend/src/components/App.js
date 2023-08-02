@@ -81,9 +81,8 @@ function App() {
     api
       .deleteCard(cardForDelete._id)
       .then(() => {
-        setCurrentCards((state) =>
-          state.filter((item) => item._id !== cardForDelete._id)
-        );
+        const newCards = currentCards.filter((element) => element !== cardForDelete);
+        setCurrentCards(newCards);
         closeAllPopups();
       })
       .catch((err) => {
