@@ -11,6 +11,7 @@ const { login, createUser } = require('./controllers/users');
 const errorHandler = require('./middlewares/errorHandler');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const NotFoundError = require('./errors/NotFoundError');
 
 const app = express();
 app.disable('x-powered-by');
@@ -52,10 +53,11 @@ app.post(
   createUser,
 );
 app.use(auth);
-app.use('/', auth, userRoutes);
-app.use('/', auth, cardRoutes);
-app.all('*', (req, res) => {
-  res.status(404).send({ message: 'Указан неправильный путь' });
+app.use('/users', auth, userRoutes);
+app.use('/cards', auth, cardRoutes);
+app.all('*', (next) => {
+  console.log('неправильный путь');
+  next(new NotFoundError('Указан неправильный путь'));
 });
 app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());

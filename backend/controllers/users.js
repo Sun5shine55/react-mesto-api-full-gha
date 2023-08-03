@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const ValidationError = require('../errors/ValidationError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
 const ConflictError = require('../errors/ConflictError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
+const MONGO_ERROR = 11000;
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -22,8 +22,12 @@ const getMyData = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(() => res.status(404).send({ message: 'Пользователь по указанному _id не найден' }))
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь по указанному _id не найден');
+      }
+      return res.send(user);
+    })
     .catch(next);
 };
 
@@ -31,29 +35,28 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!email || !password) {
-    throw new ValidationError('Не переданы email или пароль');
-  } return User.findOne({ email })
-    .then((oldUser) => {
-      if (oldUser) { throw new ConflictError('Пользователь с таким email уже зарегистрирован'); }
-      return bcrypt.hash(password, 8)
-        .then((hash) => User.create({
-          name,
-          about,
-          avatar,
-          email,
-          password: hash,
-        }))
-        .then((user) => res.status(201).send({
-          _id: user._id,
-          email: user.email,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-        }))
-        .catch(next);
+  bcrypt.hash(password, 8)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((newUser) => {
+      const userWithoutPassword = newUser.toJSON();
+      delete userWithoutPassword.password;
+      res.status(201).send(userWithoutPassword);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные при создании пользователя'));
+      } else if (err.code === MONGO_ERROR) {
+        next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const updateUserData = (req, res, next) => {
@@ -63,7 +66,14 @@ const updateUserData = (req, res, next) => {
     runValidators: true,
     upsert: false,
   })
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        return () => {
+          throw new NotFoundError('Пользователь по указанному _id не найден');
+        };
+      }
+      return res.status(200).send(user);
+    })
     .catch(next);
 };
 
@@ -99,9 +109,7 @@ const login = (req, res, next) => {
       });
       return res.status(200).send({ email });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Ошибка авторизации'));
-    });
+    .catch(next);
 };
 
 const logout = (req, res) => {
