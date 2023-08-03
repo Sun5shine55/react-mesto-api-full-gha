@@ -53,8 +53,8 @@ app.post(
   createUser,
 );
 app.use(auth);
-app.use('/users', auth, userRoutes);
-app.use('/cards', auth, cardRoutes);
+app.use('/', auth, userRoutes);
+app.use('/', auth, cardRoutes);
 app.all('*', (next) => {
   console.log('неправильный путь');
   next(new NotFoundError('Указан неправильный путь'));
