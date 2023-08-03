@@ -4,14 +4,11 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { celebrate, errors, Joi } = require('celebrate');
-const userRoutes = require('./routes/users');
-const cardRoutes = require('./routes/cards');
-const { login, createUser } = require('./controllers/users');
 const errorHandler = require('./middlewares/errorHandler');
-const auth = require('./middlewares/auth');
+
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const NotFoundError = require('./errors/NotFoundError');
+
+const router = require('./routes/index');
 
 const app = express();
 app.disable('x-powered-by');
@@ -28,39 +25,8 @@ app.use(cors({
   credentials: true,
 }));
 app.use(requestLogger); // подключаем логгер запросов
-app.post(
-  '/signin',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      password: Joi.string().required().min(4),
-    }),
-  }),
-  login,
-);
-
-app.post(
-  '/signup',
-  celebrate({
-    body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string().pattern(/^(https?:\/\/)(www\.)?[a-z0-9-._~:/?#[\]@!$&()*+,;=]{1,256}\.[a-z]{2,6}\b([a-z0-9-._~:/?#[\]@!$&()*+,;=]*)/i),
-      email: Joi.string().required().email(),
-      password: Joi.string().required(),
-    }),
-  }),
-  createUser,
-);
-app.use(auth);
-app.use('/', auth, userRoutes);
-app.use('/', auth, cardRoutes);
-app.all('*', (next) => {
-  console.log('неправильный путь');
-  next(new NotFoundError('Указан неправильный путь'));
-});
+app.use(router);
 app.use(errorLogger); // подключаем логгер ошибок
-app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {

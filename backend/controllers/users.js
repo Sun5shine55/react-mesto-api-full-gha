@@ -6,7 +6,7 @@ const ValidationError = require('../errors/ValidationError');
 const ConflictError = require('../errors/ConflictError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const MONGO_ERROR = 11000;
+const MONGO_ERROR_CONFLIKT = 11000;
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -51,7 +51,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные при создании пользователя'));
-      } else if (err.code === MONGO_ERROR) {
+      } else if (err.code === MONGO_ERROR_CONFLIKT) {
         next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
       } else {
         next(err);
