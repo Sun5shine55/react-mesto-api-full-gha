@@ -43,7 +43,7 @@ const putLike = (req, res, next) => {
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).orFail(new NotFoundError())
+  )
     .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {

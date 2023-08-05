@@ -66,14 +66,7 @@ const updateUserData = (req, res, next) => {
     runValidators: true,
     upsert: false,
   })
-    .then((user) => {
-      if (!user) {
-        return () => {
-          throw new NotFoundError('Пользователь по указанному _id не найден');
-        };
-      }
-      return res.status(200).send(user);
-    })
+    .then((user) => res.status(200).send(user))
     .catch(next);
 };
 

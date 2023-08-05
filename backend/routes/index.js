@@ -4,7 +4,7 @@ const userRoutes = require('./users');
 const cardRoutes = require('./cards');
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
-const ConflictError = require('../errors/ConflictError');
+const NotFoundError = require('../errors/NotFoundError');
 
 router.post(
   '/signin',
@@ -34,8 +34,7 @@ router.use(auth);
 router.use('/', auth, userRoutes);
 router.use('/', auth, cardRoutes);
 router.all('*', (next) => {
-  console.log('Указан неправильный маршрут');
-  const error = new ConflictError('Указан неправильный маршрут');
+  const error = new NotFoundError('Указан неправильный маршрут');
   next(error);
 });
 router.use(errors());
